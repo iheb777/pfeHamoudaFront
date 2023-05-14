@@ -15,19 +15,14 @@ import {
   Public,
   AccountTreeRounded,
   DashboardRounded,
-  AddTaskRounded, AccessibilityNew,
 } from "@mui/icons-material";
-import { tagColors } from "../../../data/data";
 import LogoIcon from "../../../Images/Logo.svg";
 import { useDispatch } from "react-redux";
 import { logout } from "../../../redux/userSlice";
 import { openSnackbar } from "../../../redux/snackbarSlice";
-import axios from "axios";
 import { useSelector } from "react-redux";
-import { getUsers, notifications } from "../../../api/index";
+import { getUsers } from "../../../api/index";
 import { useNavigate } from 'react-router-dom';
-import { Avatar, CircularProgress } from "@mui/material";
-import Skeleton from "@mui/material/Skeleton";
 
 const Container = styled.div`
   flex: 1.3;
@@ -102,22 +97,6 @@ const Hr = styled.hr`
   border: 0.5px solid ${({ theme }) => theme.soft};
 `;
 
-const Title = styled.h2`
-  font-size: 15px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.textSoft + "99"};
-  margin-bottom: 4px;
-  padding: 0px 26px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const TeamIcon = styled(WorkspacesRounded)`
-  color: ${({ tagColor }) => tagColor};
-  font-size: 18px;
-  margin-left: 2px;
-`;
 
 const AdminMenu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
   const [teamsLoading, setTeamsLoading] = useState(true);
@@ -170,44 +149,6 @@ const AdminMenu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
             Dashboard
           </Item>
         </Link>
-        <Link
-          to="/projects"
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <Item>
-            <AccountTreeRounded />
-            Manage projects
-          </Item>
-        </Link>
-
-        <Hr />
-        <Title>
-          <Groups2Rounded /> Teams
-        </Title>
-        {teamsLoading ? (
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px'}}>
-              <CircularProgress size='24px' />
-            </div>
-        ) : (<>
-              {team.map((team, i) => (
-                  <Link
-                      to={`/teams/${team._id}`}
-                      style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    <Item>
-                      {team.img !== "" ?
-                          <Avatar sx={{ width: "28px", height: "28px" }} src={team.img}>{team.name[0]}</Avatar> :
-                          <TeamIcon sx={{ fontSize: "18px" }} tagColor={tagColors[i]} />}
-                      {team.name}
-                    </Item>
-                  </Link>
-              ))}
-            </>
-        )}
-        <Item onClick={() => setNewTeam(true)}>
-          <Add sx={{ fontSize: "20px" }} />
-          New Team
-        </Item>
         <Hr />
         <Item onClick={() => setDarkMode(!darkMode)}>
           <SettingsBrightnessOutlinedIcon />

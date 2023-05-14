@@ -15,7 +15,7 @@ import {
 import WorkCards from "../../components/WorkCards";
 import { CircularProgress, IconButton } from "@mui/material";
 import { useDispatch } from "react-redux";
-import {adminGetAllJury, userTasks, userWorks} from "../../api/index";
+import {adminDeleteUser, adminGetAllJury, userTasks, userWorks} from "../../api/index";
 import WorkDetails from "../../components/WorkDetails";
 import TaskCard from "../../components/TaskCard";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
@@ -407,13 +407,68 @@ const Left = Styled.div`
   gap: 20px;
 `;
 
+const CreateButton = Styled.div`
+  padding: 20px 30px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 800;
+  color: ${({ theme }) => theme.text};
+  border-radius: 12px;
+  background: linear-gradient(76.35deg, #801AE6 15.89%, #A21AE6 89.75%);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  &:hover {
+    background: linear-gradient(76.35deg, #801AE6 15.89%, #A21AE6 89.75%);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
+  }
+  gap: 14px;
 
-const ManageJury = () => {
+  ${({ btn }) =>
+    btn === "team" &&
+    `
+    background: linear-gradient(76.35deg, #FFC107 15.89%, #FFC107 89.75%);
+    &:hover {
+      background: linear-gradient(76.35deg, #FFC107 15.89%, #FFC107 89.75%);
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
+    }
+  `}
+`;
+
+const Icon = Styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background: ${({ theme }) => theme.text};
+  color: ${({ theme }) => theme.primary};
+  border-radius: 50%;
+  padding: 4px;
+`;
+
+
+const ManageJury = ({setNewJury}) => {
   const dispatch = useDispatch();
   const [jurys, setJury] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("token");
+
+
+  const deleteJury=async(workId)=> {
+    console.log(workId)
+    await adminDeleteUser(workId, token).then((res) => {
+      window.location.reload(false);
+      setLoading(false);
+      console.log(res.data);
+    }).catch((err) => {
+      console.log("couldn't delete project because : " + err);
+      setLoading(false);
+    })
+  }
 
   const getJury = async () => {
    await  adminGetAllJury(token)
@@ -442,6 +497,13 @@ const ManageJury = () => {
             </div>
         ) : (
             <Left>
+                <br></br>
+              <CreateButton onClick={() => setNewJury(true)}>
+                <Icon>
+                  <Add style={{ color: 'ActiveBorder' }} />
+                </Icon>
+                Create New Jury
+              </CreateButton>
               <SectionTitle>All juries</SectionTitle>
               {
                 jurys
@@ -449,7 +511,7 @@ const ManageJury = () => {
                     .filter((item, index) => index < 6)
                     .map((prof, id) => (
                         <AdminProfCard
-                            prof={prof}
+                            prof={prof} deleteUser={deleteJury}
                         />
                     ))
               }

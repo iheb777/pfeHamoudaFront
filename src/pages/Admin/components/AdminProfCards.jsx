@@ -132,7 +132,7 @@ const IcoBtn = styled(IconButton)`
   color: ${({ theme }) => theme.textSoft} !important;
 `;
 
-const AdminProfCard = ({  prof }) => {
+const AdminProfCard = ({  prof ,deleteUser}) => {
 
 
   //check the no of tasks completed in the work and set the progress
@@ -162,7 +162,7 @@ const AdminProfCard = ({  prof }) => {
           <TimelapseRounded sx={{ fontSize: "22px" }} /> Updated{" "}
           {format(prof.updatedAt)}
         </Time>
-        <Button variant="outlined" color="error">
+        <Button variant="outlined" color="error" onClick={()=>deleteUser(prof._id)}>
           Delete
         </Button>
       </Bottom>

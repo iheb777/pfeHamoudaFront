@@ -170,44 +170,6 @@ const AdminMenu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
             Dashboard
           </Item>
         </Link>
-        <Link
-          to="/projects"
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <Item>
-            <AccountTreeRounded />
-            Manage projects
-          </Item>
-        </Link>
-
-        <Hr />
-        <Title>
-          <Groups2Rounded /> Teams
-        </Title>
-        {teamsLoading ? (
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px'}}>
-              <CircularProgress size='24px' />
-            </div>
-        ) : (<>
-              {team.map((team, i) => (
-                  <Link
-                      to={`/teams/${team._id}`}
-                      style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    <Item>
-                      {team.img !== "" ?
-                          <Avatar sx={{ width: "28px", height: "28px" }} src={team.img}>{team.name[0]}</Avatar> :
-                          <TeamIcon sx={{ fontSize: "18px" }} tagColor={tagColors[i]} />}
-                      {team.name}
-                    </Item>
-                  </Link>
-              ))}
-            </>
-        )}
-        <Item onClick={() => setNewTeam(true)}>
-          <Add sx={{ fontSize: "20px" }} />
-          New Team
-        </Item>
         <Hr />
         <Item onClick={() => setDarkMode(!darkMode)}>
           <SettingsBrightnessOutlinedIcon />

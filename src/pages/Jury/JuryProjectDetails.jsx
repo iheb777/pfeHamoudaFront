@@ -21,8 +21,8 @@ import ToolsCard from "../../components/ToolsCard";
 import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import {openSnackbar} from "../../redux/snackbarSlice";
-import {useDispatch} from "react-redux";
-import {getComments, getProjectDetails, getWorks} from "../../api/index";
+import {useDispatch, useSelector} from "react-redux";
+import {addComment, addScore, getComments, getProjectDetails, getScore, getWorks} from "../../api/index";
 import InviteMembers from "../../components/InviteMembers";
 import AddWork from "../../components/AddWork";
 import WorkDetails from "../../components/WorkDetails";
@@ -141,6 +141,50 @@ const Hr = styled.hr`
   margin: 18px 0px;
   border: 0.5px solid ${({theme}) => theme.soft + "99"};
 `;
+
+
+const TextArea = styled.textarea`
+  width: 100%;
+  border: none;
+  font-size: 14px;
+  border-radius: 3px;
+  background-color: transparent;
+  outline: none;
+  font-family: "Poppins", sans-serif;
+  padding: 8px 0px;
+  color: ${({theme}) => theme.textSoft};
+`;
+const OutlinedBox = styled.div`
+  min-height: 34px;
+  border-radius: 8px;
+  border: 1px solid ${({theme}) => theme.soft2};
+  color: ${({theme}) => theme.soft2};
+  ${({button, theme}) =>
+          button &&
+          `
+    user-select: none; 
+  border: none;
+  font-weight: 600;
+  height: 38px;
+    background: ${theme.soft};
+    color:'${theme.soft2}';`}
+  ${({activeButton, theme}) =>
+          activeButton &&
+          `
+    user-select: none; 
+  border: none;
+  height: 38px;
+    background: ${theme.primary};
+    color: white;`}
+  margin: 6px 0px;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  padding: 0px 10px;
+`;
+
 
 const Body = styled.div`
   display: flex;
@@ -315,7 +359,7 @@ const Ideas = styled.div`
   padding: 8px 8px;
 `;
 
-const CoachProjectDetails = () => {
+const JuryProjectDetails = () => {
     const {id} = useParams();
     const [item, setItems] = useState([]);
     const [members, setMembers] = useState([]);
@@ -330,20 +374,25 @@ const CoachProjectDetails = () => {
 
     const token = localStorage.getItem("token");
 
-    //hooks for updates
-    //use state enum to check for which updation
     const [openUpdate, setOpenUpdate] = useState({state: false, type: "all", data: item});
 
-    //use state for delete popup
     const [openDelete, setOpenDelete] = useState({state: false, type: "Project", data: item, token: token});
 
     const dispatch = useDispatch();
+    const { currentUser } = useSelector((state) => state.user);
+
+    const [score, setScore] = useState(0);
+    const [bcm1, setBcm1] = useState(0);
+    const [bcm2, setBcm2] = useState(0);
+
+
     const getproject = async () => {
         await getProjectDetails(id, token)
             .then((res) => {
                 setItems(res.data);
                 setMembers(res.data.members);
                 getProjectComment(id)
+                getProjectScore(id)
             })
             .then(() => {
                 setLoading(false);
@@ -358,11 +407,38 @@ const CoachProjectDetails = () => {
             });
     };
 
+    const goToAddScore = () => {
+        setLoading(true);
+        addScore(id, {userId: currentUser._id, score : score, bcm1: bcm1, bcm2: bcm2}, token)
+            .then((res) => {
+                setLoading(false);
+                // window.location.reload(false);
+               // setCreated(true);
+                dispatch(
+                    openSnackbar({
+                        message: "Rated Successfully",
+                        severity: "success",
+                    })
+                );
+            })
+            .catch((err) => {
+                console.log(err);
+                dispatch(
+                    openSnackbar({
+                        message: err.message,
+                        severity: "error",
+                    })
+                );
+                setLoading(false);
+            });
+
+    };
+
+
     const getProjectComment = async (id) => {
         await getComments(id, token)
             .then((res) => {
                 setComments(res.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 dispatch(
@@ -373,6 +449,27 @@ const CoachProjectDetails = () => {
                 );
             });
     };
+
+    const getProjectScore = async (id) => {
+        await getScore(id, token)
+            .then((res) => {
+                let myData=res.data[0];
+                setScore(myData.score);
+                setBcm1(myData.bcm1);
+                setBcm2(myData.bcm2);
+                console.log("---------------");
+                console.log(res.data[0]);
+            })
+            .catch((err) => {
+                dispatch(
+                    openSnackbar({
+                        message: err.response.data.message,
+                        severity: "error",
+                    })
+                );
+            });
+    };
+
 
     const getProjectWorks = async (id) => {
         await getWorks(id, token)
@@ -445,9 +542,9 @@ const CoachProjectDetails = () => {
                                 {members.map((member) => (
                                     <Avatar
                                         sx={{marginRight: "-12px", width: "38px", height: "38px"}}
-                                        // src={member.id.img}
+                                        src={member.id.img}
                                     >
-                                        {member.id.name}
+                                        {member.id.name.charAt(0)}
                                     </Avatar>
                                 ))}
                             </AvatarGroup>
@@ -562,16 +659,66 @@ const CoachProjectDetails = () => {
                             </SubCards>
                             <SubCards>
                                 <SubCardTop>
-                                    <SubCardsTitle>Tools</SubCardsTitle>
-                                    <IcoBtn onClick={() => setOpenUpdate({state: true, type: 'tool', data: item})}>
-                                        <Edit sx={{fontSize: "16px"}}/>
-                                    </IcoBtn>
+                                    <SubCardsTitle>Score</SubCardsTitle>
+                                         <Rating
+                                            value={score}
+                                            onChange={(event, newValue) => {
+                                                setScore(newValue);
+                                            }}
+                                        ></Rating>
+                                        <OutlinedBox
+                                            button
+                                            activeButton
+                                            style={{marginTop: "14px"}}
+                                            onClick={() => goToAddScore()}
+                                        >
+                                            Update
+                                        </OutlinedBox>
+                                 </SubCardTop>
+                                <SubCardTop>
+                                    <SubCardsTitle>BCM1</SubCardsTitle>
+
+                                        <OutlinedBox>
+                                            <TextArea
+                                                placeholder={bcm1}
+                                                name="bcm1"
+                                                rows={1}
+                                                value={bcm1}
+                                                onChange={(e) => setBcm1(e.target.value)}
+                                            />
+                                        </OutlinedBox>
+                                        <OutlinedBox
+                                            button
+                                            activeButton
+                                            style={{marginTop: "14px"}}
+                                            onClick={() => goToAddScore()}
+                                        >
+                                            Update
+                                        </OutlinedBox>
+
                                 </SubCardTop>
-                                <Tools>
-                                    {item.tools.map((tool) => (
-                                        <ToolsCard tool={tool}/>
-                                    ))}
-                                </Tools>
+                                <SubCardTop>
+                                    <SubCardsTitle>BCM2</SubCardsTitle>
+
+                                        <OutlinedBox>
+                                            <TextArea
+                                                placeholder={bcm2}
+                                                name="bcm2"
+                                                rows={1}
+                                                value={bcm2}
+                                                onChange={(e) => setBcm2(e.target.value)}
+                                            />
+                                        </OutlinedBox>
+                                        <OutlinedBox
+                                            button
+                                            activeButton
+                                            style={{marginTop: "14px"}}
+                                            onClick={() => goToAddScore()}
+                                        >
+                                            Update
+                                        </OutlinedBox>
+
+                                </SubCardTop>
                             </SubCards>
                         </Extra>
                     </Body>
@@ -582,9 +729,6 @@ const CoachProjectDetails = () => {
                 <SubCardTop>
                     <SubCardsTitle>Comments</SubCardsTitle>
                 </SubCardTop>
-                {
-                    console.log(comments)
-                }
                 {comments.map((item) => (
                     <CommentCard member={item}/>
                 ))}
@@ -599,4 +743,4 @@ const CoachProjectDetails = () => {
     );
 };
 
-export default CoachProjectDetails;
+export default JuryProjectDetails;

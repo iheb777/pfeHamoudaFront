@@ -15,7 +15,7 @@ import { LinearProgress } from "@mui/material";
 import { statuses, data, tagColors } from "../../data/data";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "../../redux/snackbarSlice";
-import { getProjects, userTasks } from "../../api";
+import {getAllProjects, getProjects, userTasks} from "../../api";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 
 const Container = Styled.div`
@@ -286,7 +286,7 @@ const JuryDashboard = ({ setNewProject, setNewTeam, newProject }) => {
   const token = localStorage.getItem("token");
   const getprojects = async () => {
     setLoading(true);
-    await getProjects(token)
+    await getAllProjects(token)
       .then((res) => {
         setProjects(res.data);
         getTotalProjectsDone();
@@ -421,17 +421,7 @@ const JuryDashboard = ({ setNewProject, setNewTeam, newProject }) => {
             </RecentProjects>
 
           </Left>
-          <Right>
 
-            <TopBar>
-              <CreateButton btn="team" onClick={() => setNewTeam(true)}>
-                <Icon>
-                  <Add style={{ color: '#FFC107' }} />
-                </Icon>
-                Create New Team
-              </CreateButton>
-            </TopBar>
-          </Right>
         </Section>
       )}
     </Container >

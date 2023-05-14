@@ -1,22 +1,21 @@
-
 import React from "react";
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import ProjectCard from "../../components/Card";
-import Styled, { useTheme } from "styled-components";
+import Styled, {useTheme} from "styled-components";
 import ProjectStatCard from "../../components/ProjectStatCard";
-import { Add } from "@mui/icons-material";
+import {Add} from "@mui/icons-material";
 import CircularProgress, {
-  CircularProgressProps,
+    CircularProgressProps,
 } from '@mui/material/CircularProgress';
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { LinearProgress } from "@mui/material";
-import { statuses, data, tagColors } from "../../data/data";
-import { useDispatch } from "react-redux";
-import { openSnackbar } from "../../redux/snackbarSlice";
-import {adminGetAllStudents, getProjects, userTasks} from "../../api";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
+import {LinearProgress} from "@mui/material";
+import {statuses, data, tagColors} from "../../data/data";
+import {useDispatch} from "react-redux";
+import {openSnackbar} from "../../redux/snackbarSlice";
+import {adminDeleteUser, adminGetAllStudents, getProjects, userTasks} from "../../api";
+import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
 import AdminStudentCard from "./components/AdminStudentCards";
 
 const Container = Styled.div`
@@ -49,7 +48,6 @@ const Right = Styled.div`
 `;
 
 
-
 const RecentProjects = Styled.div`
   width: 100%;
   height: 100%;
@@ -57,7 +55,7 @@ const RecentProjects = Styled.div`
   margin: 2px;
   font-size: 18px;
   font-weight: 500;
-  color: ${({ theme }) => theme.text};
+  color: ${({theme}) => theme.text};
   border-radius: 12px;
 `;
 
@@ -67,36 +65,37 @@ const SectionTitle = Styled.div`
   font-size: 22px;
   font-weight: 600;
   margin: 10px 0px 16px 0px;
-  color: ${({ theme }) => theme.text};
+  color: ${({theme}) => theme.text};
 `;
 
 
 function CircularProgressWithLabel(props
 ) {
-  const theme = useTheme();
-  return (
-    <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <CircularProgress variant="determinate" {...props} thickness={6} size="60px" style={{ color: theme.primary }} />
-      <Box
-        sx={{
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          position: 'absolute',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Typography
-          variant="caption"
-          component="div"
-          color="inherit"
-        >{`${Math.round(props.value)}`}</Typography>
-      </Box>
-    </Box>
-  );
+    const theme = useTheme();
+    return (
+        <Box sx={{position: 'relative', display: 'inline-flex'}}>
+            <CircularProgress variant="determinate" {...props} thickness={6} size="60px"
+                              style={{color: theme.primary}}/>
+            <Box
+                sx={{
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    position: 'absolute',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Typography
+                    variant="caption"
+                    component="div"
+                    color="inherit"
+                >{`${Math.round(props.value)}`}</Typography>
+            </Box>
+        </Box>
+    );
 }
 
 // backgroundColor: 'lightyellow',
@@ -104,69 +103,88 @@ function CircularProgressWithLabel(props
 //   backgroundColor: 'orange'
 // }
 
-const ManageStudent = ({ setNewProject, setNewTeam, newProject }) => {
+const ManageStudent = () => {
 
-  const dispatch = useDispatch();
-  const [students, setStudents] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-
-  const token = localStorage.getItem("token");
-  const getStudents = async () => {
-    setLoading(true);
-    await adminGetAllStudents(token)
-      .then((res) => {
-        setStudents(res.data);
-          setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        dispatch(
-          openSnackbar({
-            message: err.response.data.message,
-            severity: "error",
-          })
-        );
-      });
-  };
+    const dispatch = useDispatch();
+    const [students, setStudents] = useState([]);
+    const [tasks, setTasks] = useState([]);
+    const [loading, setLoading] = useState(true);
 
 
-
-  useEffect(() => {
-    getStudents();
-    window.scrollTo(0, 0);
-  }, []);
+    const token = localStorage.getItem("token");
 
 
-  return (
-    <Container>
-      {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px', height: '300px' }}>
-          <CircularProgress />
-        </div>
-      ) : (
+    const deleteStudent = async (workId) => {
+        await adminDeleteUser(workId, token).then((res) => {
+            setLoading(false);
+            console.log(res.data);
+            getStudents()
+        }).catch((err) => {
+            console.log("couldn't delete project because : " + err);
+            setLoading(false);
+        })
+    }
 
-          <Left>
+    const getStudents = async () => {
+        setLoading(true);
+        await adminGetAllStudents(token)
+            .then((res) => {
+                setStudents(res.data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                setLoading(false);
+                dispatch(
+                    openSnackbar({
+                        message: err.response.data.message,
+                        severity: "error",
+                    })
+                );
+            });
+    };
 
-              <SectionTitle>All students</SectionTitle>
+
+    useEffect(() => {
+        getStudents();
+        window.scrollTo(0, 0);
+    }, []);
+
+
+    return (
+        <Container>
+            {loading ? (
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '12px 0px',
+                    height: '300px'
+                }}>
+                    <CircularProgress/>
+                </div>
+            ) : (
+
+                <Left>
+
+                    <SectionTitle>All students</SectionTitle>
                     {
-                    students
-                      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-                      .filter((item, index) => index < 6)
-                      .map((student, id) => (
-                        <AdminStudentCard
-                            student={student}
-                        />
-                      ))
-                  }
+                        students
+                            .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+                            .filter((item, index) => index < 6)
+                            .map((student, id) => (
+                                <AdminStudentCard
+                                    student={student} deleteStudent={deleteStudent}
+                                />
+                            ))
+                    }
 
-          </Left>
+                </Left>
 
 
-      )}
-    </Container >
-  );
+            )}
+        </Container>
+    );
 };
 
 export default ManageStudent;

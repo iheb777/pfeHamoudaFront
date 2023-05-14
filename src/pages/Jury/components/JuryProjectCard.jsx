@@ -180,7 +180,7 @@ const JuryProjectCard = ({ tagColor, item, index, status }) => {
             <Rating name="size-medium" defaultValue={2} />
             <AvatarGroup>
               {item.members.map((member) => (
-                <Avatar sx={{marginRight: '-12px', width: '34px', height: '34px'}}  src={member.id.img} >{member.id.name.charAt(0)}</Avatar>
+                <Avatar sx={{marginRight: '-12px', width: '34px', height: '34px'}}  src={member.id.img} >{member.id.name}</Avatar>
               ))}
             </AvatarGroup>
           </Bottom>

@@ -26,6 +26,7 @@ import {
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import ImageSelector from "./ImageSelector";
+import FileSelector from "./FileSelector";
 
 const Container = styled.div`
   width: 100%;
@@ -302,7 +303,7 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
   const [role, setRole] = useState("");
   const [access, setAccess] = useState("");
   const [selectedUsers, setSelectedUsers] = React.useState([]);
-  const [inputs, setInputs] = useState({ img: "", title: "", desc: "" });
+  const [inputs, setInputs] = useState({ img: "",file:"", title: "", desc: "" });
 
   const token = localStorage.getItem("token");
   const handleSearch = async (e) => {
@@ -517,6 +518,8 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
             <>
               <Label>Project Details :</Label>
               <ImageSelector inputs={inputs} setInputs={setInputs} style={{ marginTop: "12px" }}/>
+              <FileSelector inputs={inputs} setInputs={setInputs} style={{ marginTop: "12px" }}/>
+
               <OutlinedBox style={{ marginTop: "12px" }}>
                 <TextInput
                   placeholder="Title (Required)*"

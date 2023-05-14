@@ -12,13 +12,11 @@ import {
   Edit,
   PersonAdd,
 } from "@mui/icons-material";
-import WorkCards from "../../components/WorkCards";
 import { CircularProgress, IconButton } from "@mui/material";
 
 import { useDispatch } from "react-redux";
 import {adminDeleteProject, deleteProject, getAllProjects, userTasks, userWorks} from "../../api/index";
 import WorkDetails from "../../components/WorkDetails";
-import TaskCard from "../../components/TaskCard";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import AdminProjectCards from "./components/AdminProjectCards";
 
@@ -31,107 +29,6 @@ const Container = styled.div`
 
 const Header = styled.div``;
 
-const Column = styled.div`
-  display: flex;
-  ${(props) =>
-    props.alignment ? "flex-direction: column;" : "flex-direction: row;"}
-  margin: 12px 0px;
-  flex-wrap: wrap;
-  align-items: stretch;
-  @media screen and (max-width: 480px) {
-    margin: 6px 0px;
-    flex-direction: column;
-  }
-`;
-
-const Title = styled.div`
-  font-size: 24px;
-  @media screen and (max-width: 480px) {
-    font-size: 20px;
-  }
-  font-weight: 500;
-  color: ${({ theme }) => theme.text};
-  margin-top: 6px;
-  flex: 7;
-  line-height: 1.5;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* number of lines to show */
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-`;
-
-const Desc = styled.div`
-  font-size: 13px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.soft2};
-  margin-top: 6px;
-  flex: 7;
-  line-height: 1.5;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* number of lines to show */
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-`;
-
-const Tags = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  gap: 6px;
-  margin-top: 14px;
-`;
-
-const Tag = styled.div`
-  padding: 4px 10px;
-  border-radius: 8px;
-  color: ${({ tagColor, theme }) => tagColor + theme.lightAdd};
-  background-color: ${({ tagColor, theme }) => tagColor + "10"};
-  font-size: 12px;
-  font-weight: 500;
-`;
-
-const Members = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 16px 0px;
-`;
-
-const AvatarGroup = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: 12px;
-`;
-
-const InviteButton = styled.button`
-  padding: 6px 14px;
-  background-color: transparent;
-  border: 1px solid ${({ theme }) => theme.primary};
-  color: ${({ theme }) => theme.primary};
-  border-radius: 3px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  margin: 0px 16px;
-  &:hover {
-    background-color: ${({ theme }) => theme.primary};
-    color: ${({ theme }) => theme.text};
-  }
-`;
-
-const Hr = styled.hr`
-  margin: 18px 0px;
-  border: 0.5px solid ${({ theme }) => theme.soft + "99"};
-`;
 
 const Body = styled.div`
   display: flex;
@@ -225,65 +122,7 @@ const Span = styled.span`
 `;
 
 
-const No = styled.div`
-  width: 4%;
-  font-size: 12px;
-  text-overflow: ellipsis;
-  font-weight: 500;
-  color: ${({ theme }) => theme.soft2};
-  display: -webkit-box;
-  -webkit-line-clamp: 5; /* number of lines to show */
-  line-clamp: 5;
-  -webkit-box-orient: vertical;
 
-  ${({ completed, theme }) =>
-    completed === "Completed" &&
-    `
-    text-decoration: line-through;
-    `}
-`;
-
-const Task = styled.div`
-  width: 50%;
-  font-size: 12px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.soft2};
-  display: -webkit-box;
-  -webkit-line-clamp: 5; /* number of lines to show */
-  line-clamp: 5;
-  -webkit-box-orient: vertical;
-  padding: 6px;
-
-  ${({ completed, theme }) =>
-    completed === "Completed" &&
-    `
-    text-decoration: line-through;
-    `}
-`;
-
-const Date = styled.div`
-  font-size: 12px;
-  font-weight: 500;
-  text-align: center;
-  text-overflow: ellipsis;
-  width: 14%;
-  color: ${({ theme }) => theme.soft2};
-  ${({ enddate, theme }) =>
-    enddate &&
-    `
-    color: ${theme.pink};
-    `}
-  display: -webkit-box;
-  -webkit-line-clamp: 5; /* number of lines to show */
-  line-clamp: 5;
-  -webkit-box-orient: vertical;
-
-  ${({ completed, theme }) =>
-    completed === "Completed" &&
-    `
-  text-decoration: line-through;
-  `}
-`;
 
 const AdminHome = () => {
   const { id } = useParams();
@@ -302,10 +141,17 @@ const AdminHome = () => {
 
 
   const deleteP=async(workId)=> {
-    await deleteProject(workId, token).then(() => {
-      setWorks(current => current.filter(w => w._id !== workId));
+    console.log(workId)
+    await adminDeleteProject(workId, token).then((res) => {
+      getWorks()
+      setWorks(res.data);
+      setLoading(false);
+      console.log(res.data);
+      window.location.reload(false);
+
     }).catch((err) => {
       console.log("couldn't delete project because : " + err);
+      setLoading(false);
     })
   }
   const getWorks = async () => {
@@ -333,10 +179,6 @@ const AdminHome = () => {
       });
   };
 
-  const openWorkDetails = (work) => {
-    setCurrentWork(work);
-    setOpenWork(true);
-  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -344,7 +186,6 @@ const AdminHome = () => {
     getTasks();
   }, []);
 
-  console.log(item);
   const [alignment, setAlignment] = React.useState(true);
 
   return (

@@ -1,19 +1,12 @@
 import React, { useEffect } from "react";
-import { Fragment, useState, useRef } from "react";
 import styled from "styled-components";
 import {
-  ImportantDevices,
   MoreVert,
   TimelapseRounded,
   StarsRounded
 } from "@mui/icons-material";
-import LinearProgress, {
-  linearProgressClasses,
-} from "@mui/material/LinearProgress";
 import { format } from "timeago.js";
-import { tagColors } from "../../../data/data";
-import {Avatar, Button, IconButton} from "@mui/material";
-import {adminDeleteProject, deleteProject} from "../../../api";
+import { Button, IconButton} from "@mui/material";
 
 const Container = styled.div`
   padding: 14px;
@@ -67,21 +60,6 @@ const Desc = styled.div`
   -webkit-box-orient: vertical;
 `;
 
-const Progress = styled.div`
-  position: relative;
-`;
-
-const Text = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.soft2};
-  margin: 14px 0px 10px 0px;
-  line-height: 1.5;
-  overflow: hidden;
-`;
 
 const Tags = styled.div`
   display: flex;
@@ -91,21 +69,7 @@ const Tags = styled.div`
   margin-top: 8px;
 `;
 
-const Tag = styled.div`
-  padding: 4px 10px;
-  border-radius: 8px;
-  color: ${({ tagColor, theme }) => tagColor + theme.lightAdd};
-  background-color: ${({ tagColor, theme }) => tagColor + "10"};
-  font-size: 10px;
-  font-weight: 500;
-`;
 
-const Span = styled.span`
-  font-size: 12px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.soft2};
-  line-height: 1.5;
-`;
 
 const Bottom = styled.div`
   display: flex;
@@ -123,16 +87,11 @@ const Time = styled.div`
   color: ${({ theme }) => theme.soft2 + "99"};
 `;
 
-const AvatarGroup = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: 12px;
-`;
 const IcoBtn = styled(IconButton)`
   color: ${({ theme }) => theme.textSoft} !important;
 `;
 
-const AdminStudentCard = ({  student }) => {
+const AdminStudentCard = ({  student ,deleteStudent}) => {
 
 
   //check the no of tasks completed in the work and set the progress
@@ -163,14 +122,7 @@ const AdminStudentCard = ({  student }) => {
           {format(student.updatedAt)}
         </Time>
         <div>
-
-            <Button variant="text" color="secondary">
-                As Jury
-            </Button>
-            <Button variant="text" color="primary">
-                As coach
-            </Button>
-            <Button variant="outlined" color="error">
+            <Button variant="outlined" color="error" onClick={()=>deleteStudent(student._id)}>
                 Delete
             </Button>
         </div>
