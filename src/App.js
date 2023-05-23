@@ -127,7 +127,9 @@ function App() {
 
                                                                 <Route path="works" element={<Works/>}/>
                                                                 <Route path="community" element={<Community/>}/>
-                                                                <Route path="chats" element={<Chats/>}/>
+                                                                <Route path="projects">
+                                                                    <Route path=":id/chats" element={<Chats/>}/>
+                                                                </Route>
                                                                 <Route path="*" element={<div>Not Found</div>}/>
                                                             </Route>
                                                         </Routes>

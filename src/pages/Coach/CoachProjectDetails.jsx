@@ -10,7 +10,7 @@ import {
     CheckCircleOutlineOutlined,
     Delete,
     DonutLarge,
-    Edit,
+    Edit, FileCopy,
     PersonAdd,
 } from "@mui/icons-material";
 import {tagColors} from "../../data/data";
@@ -338,6 +338,16 @@ const CoachProjectDetails = () => {
     const [openDelete, setOpenDelete] = useState({state: false, type: "Project", data: item, token: token});
 
     const dispatch = useDispatch();
+
+    function downloadPDF(pdf) {
+        const linkSource = pdf;
+        const downloadLink = document.createElement("a");
+        const fileName = "project.pdf";
+
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        downloadLink.click();
+    }
     const getproject = async () => {
         await getProjectDetails(id, token)
             .then((res) => {
@@ -483,6 +493,11 @@ const CoachProjectDetails = () => {
                                 >
                                     <AlignHorizontalLeft sx={{fontSize: "18px"}}/>
                                 </ToggleButton>
+
+                                <IcoBtn onClick={() => {downloadPDF(item.file)}}>
+                                    <FileCopy sx={{fontSize: "20px"}}/>
+                                </IcoBtn>
+
                             </Allignment>
                             <Column alignment={alignment}>
                                 <ItemWrapper>
@@ -587,7 +602,8 @@ const CoachProjectDetails = () => {
                 }
                 {comments.map((item) => (
                     <CommentCard member={item}/>
-                ))}
+                ))
+                }
             </SubCards>
             <AddComment
                 ProjectMembers={members}

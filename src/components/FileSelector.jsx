@@ -1,7 +1,8 @@
-import React from 'react'
+import React, {useState} from 'react'
 import styled from 'styled-components';
-import ReactImageFileToBase64 from "react-file-image-to-base64";
+import FileBase64 from 'react-file-base64';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { useFilePicker } from 'use-file-picker';
 
 const Container = styled.div`
     height: 120px;
@@ -30,14 +31,7 @@ const TextBtn = styled.div`
 
 
 const FileSelector = ({ inputs, setInputs }) => {
-    const handleOnCompleted = files => {
-        console.log(files[0].base64_file);
 
-        setInputs((prev) => {
-            return { ...prev, file: files[0].base64_file };
-        });
-        console.log(inputs);
-    };
 
     const CustomisedButton = ({ triggerInput }) => {
         return (
@@ -46,18 +40,33 @@ const FileSelector = ({ inputs, setInputs }) => {
             </TextBtn>
         );
     };
+
     return (
         <Container>
             {inputs.file!=="" ? <div><h1>Done</h1></div> : <>
-            <CloudUploadIcon sx={{ fontSize: "50px" }} />
-            <Typo>Drag & Drop PDF here</Typo>
+            <Typo>Select PDF here</Typo>
             <div style={{ display: "flex", gap: '6px' }}>
-                <Typo>or</Typo>
-                <ReactImageFileToBase64
-                    onCompleted={handleOnCompleted}
-                    CustomisedButton={CustomisedButton}
-                    multiple={false}
-                />
+                <div>
+                    <FileBase64
+                        multiple={ false }
+                        onDone={({base64}) => {
+                            console.log(base64);
+
+                            setInputs((prev) => {
+                                return { ...prev, file: base64 };
+                            });
+                        }
+                    }
+                        />
+                    <br />
+                    {/*{filesContent.map((file, index) => (*/}
+                    {/*    <div>*/}
+                    {/*        <h2>{file.name}</h2>*/}
+                    {/*        <div key={index}>{file.content}</div>*/}
+                    {/*        <br />*/}
+                    {/*    </div>*/}
+                    {/*))}*/}
+                </div>
             </div>
             </>
             }

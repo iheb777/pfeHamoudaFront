@@ -103,4 +103,8 @@ export const addScore = async (id,data,token) => await API.post(`/project/rate/$
 export const getScore = async (id, token) => await API.get(`/project/rate/${id}`, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
 
 
-export const getTop = async (token) => await API.get(`/project/rate/top`, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
+export const getTopProject = async (token) => await API.get(`/project/rate/top`, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
+
+
+export const addChat = async (id,text,token) => await API.post(`/project/chat/${id}`, text, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
+export const getChat = async (id, token) => await API.get(`/project/chat/${id}`, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});

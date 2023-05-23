@@ -4,9 +4,12 @@ import ForumIcon from '@mui/icons-material/Forum';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HeroBgAnimation from '../components/HeroBgAnimation'
 import Diversity3Icon from '@mui/icons-material/Diversity3';
-import {getTop, getWorks} from "../../../api";
+import {getProjects, getTop, getTopProject, getWorks} from "../../../api";
 import {openSnackbar} from "../../../redux/snackbarSlice";
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
+import {useDispatch} from "react-redux";
+import {tagColors} from "../../../data/data";
+import {CircularProgress} from "@mui/material";
 
 const FeaturesWrapper = styled.section`
   display: flex;
@@ -79,45 +82,19 @@ const Content = styled.div`
 position: relative;
 `;
 
-
-const FeaturesContainer = styled.div`
-    position: relative;
-    z-index: 1;
-    grid-template-columns: repeat(2, 1fr);
-    display: grid;
-    grid-column-gap: 60px;
-    grid-row-gap: 60px;
-    @media (max-width: 768px) {
-        grid-template-columns: repeat(1, 1fr);
-        grid-column-gap: 30px;
-        grid-row-gap: 30px;
-        
-    }
-`;
-
 const FeatureCard = styled.div`
-  width: 350px;
-  height: 190px;
+  width: 600px;
+  height: 350px;
   position: relative;
   background-color: hsl(250, 24%, 9%);
-  border: 0.1px solid #854CE6;
+  border: 0.1px solid #6de64c;
   border-radius: 16px;
-  padding: 24px 42px;
-  box-shadow: rgba(23, 92, 230, 0.15) 0px 4px 24px;
+   box-shadow: rgba(23, 92, 230, 0.15) 0px 4px 24px;
   transition: transform 0.2s ease-in-out;
   display: flex;
-  &:hover {
-    transform: translateY(-10px);
-  }
-  @media (max-width: 925px) {
-    width: 300px;
-    }
-
-  @media (max-width: 728px)
-  {
-    padding: 20px 20px;
-  }
-
+  align-items: center;
+  justify-content: center;
+  
 `;
 
 const FeatureIcon = styled.div`
@@ -166,43 +143,92 @@ const BgImage = styled.div`
     display: none;
   }
 `;
-
-
-const featuresData = [{ icon: <TrendingUpIcon />, title: 'Increased Productivity', description: 'Effortlessly manage your personal projects and assign tasks to team members while keeping track of progress.', },
-{ icon: <ForumIcon />, title: 'Improved Communication', description: 'Keep everyone on the same page and reduce misunderstandings with clear communication.', },
-{ icon: <CheckCircleOutlineIcon />, title: 'Better Project Outcomes', description: 'Make informed decisions and track progress to ensure successful project outcomes.', },
-{icon: <Diversity3Icon/>, title: 'Networking Opportunities', description: 'Connect and collaborate with other developers and professionals in your industry to expand your network and build valuable relationships.'}];
-
-
+const Tag = styled.div`
+  padding: 10px 20px;
+  margin: 10px 20px;
+  border-radius: 8px;
+  color: ${({ tagColor, theme }) => tagColor + theme.lightAdd};
+  background-color: ${({ tagColor, theme }) => tagColor + "10"};
+  font-size: 12px;
+  font-weight: 500;
+`;
 
 
 const BestProject = () => {
+    const token = localStorage.getItem("token");
+    const dispatch = useDispatch();
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const getTop = async () => {
+        await getTopProject(token)
+            .then((res) => {
+                setData(res.data);
+                console.log(res.data)
+                setLoading(false);
+            })
+            .catch((err) => {
+                setLoading(false);
+                dispatch(
+                    openSnackbar({
+                        message: err.response.data.message,
+                        severity: "error",
+                    })
+                );
+            });
+    };
+
+    useEffect(() => {
+        getTop();
+        window.scrollTo(0, 0);
+    }, []);
+
 
     return (
         <FeaturesWrapper id="top">
-          <Number>3</Number>
-            <FeaturesTitle>Best project</FeaturesTitle>
+             <FeaturesTitle>Best project</FeaturesTitle>
             <FeatureDescription>This is the best project for the last season.</FeatureDescription>
-            <Content>
-                {/* <HeroBgAnimation style={{ position: 'absolute', top: 20, left: 20, width: '80%', height: '80%', zIndex: -1 }} /> */}
-                <FeaturesContainer>
-                    {featuresData.map((feature, index) => (
-                        <FeatureCard key={index} >
-                            <div style={{flex: 1}}>
-                                <FeatureTitle>{feature.title}</FeatureTitle>
-                                <FeatureCardDescription>{feature.description}</FeatureCardDescription>
+            {
+                loading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px',height: '300px' }}>
+                        <CircularProgress />
+                    </div>
+                ) : (
+                    <Content>
+                        <FeatureCard>
+                            <div>
+                                <FeatureTitle>{data[0].projectId.title}</FeatureTitle>
+                                <FeatureCardDescription>{data[0].projectId.desc}</FeatureCardDescription>
+                                <Tag
+                                    tagColor={
+                                        tagColors[Math.floor(Math.random() * tagColors.length)]
+                                    }
+                                >
+                                    Score : {data[0].score}
+                                </Tag>
+                                <Tag
+                                    tagColor={
+                                        tagColors[Math.floor(Math.random() * tagColors.length)]
+                                    }
+                                >
+                                    BCM1 : {data[0].bcm1}
+                                </Tag>
+                                <Tag
+                                    tagColor={
+                                        tagColors[Math.floor(Math.random() * tagColors.length)]
+                                    }
+                                >
+                                    BCM2 : {data[0].bcm2}
+                                </Tag>
+                                <FeatureCardDescription>Started at : {data[0].projectId.createdAt}</FeatureCardDescription>
                             </div>
                             <FeatureIcon>
-                                {feature.icon}
+                                <TrendingUpIcon />
                             </FeatureIcon>
                         </FeatureCard>
-                    ))}
-                </FeaturesContainer>
-                <BgImage>
-                    <HeroBgAnimation />
-                </BgImage>
 
-            </Content>
+                    </Content>
+                )
+            }
         </FeaturesWrapper>
     );
 };

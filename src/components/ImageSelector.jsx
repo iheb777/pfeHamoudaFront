@@ -43,6 +43,7 @@ const ImageSelector = ({ inputs, setInputs }) => {
         setInputs((prev) => {
             return { ...prev, img: files[0].base64_file };
         });
+        console.log("Image----------")
         console.log(inputs);
     };
 

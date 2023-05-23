@@ -10,7 +10,7 @@ import {
     CheckCircleOutlineOutlined,
     Delete,
     DonutLarge,
-    Edit,
+    Edit, FileCopy,
     PersonAdd,
 } from "@mui/icons-material";
 import {tagColors} from "../../data/data";
@@ -470,6 +470,16 @@ const JuryProjectDetails = () => {
             });
     };
 
+    function downloadPDF(pdf) {
+        const linkSource = pdf;
+        const downloadLink = document.createElement("a");
+        const fileName = "project.pdf";
+
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        downloadLink.click();
+    }
+
 
     const getProjectWorks = async (id) => {
         await getWorks(id, token)
@@ -580,6 +590,14 @@ const JuryProjectDetails = () => {
                                 >
                                     <AlignHorizontalLeft sx={{fontSize: "18px"}}/>
                                 </ToggleButton>
+
+                                <IcoBtn onClick={() => {
+                                    downloadPDF(item.file)
+                                }
+                                }
+                                >
+                                    <FileCopy sx={{fontSize: "20px"}}/>
+                                </IcoBtn>
                             </Allignment>
                             <Column alignment={alignment}>
                                 <ItemWrapper>
