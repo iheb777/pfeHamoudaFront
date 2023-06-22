@@ -60,7 +60,7 @@ const Wrapper = styled.div`
 `;
 
 function App() {
-    const [darkMode, setDarkMode] = useState(true);
+    const [darkMode, setDarkMode] = useState(false);
     const [menuOpen, setMenuOpen] = useState(true);
     const [newTeam, setNewTeam] = useState(false);
     const [newCoach, setNewCoach] = useState(false);

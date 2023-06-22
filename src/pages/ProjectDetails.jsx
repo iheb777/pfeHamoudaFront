@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {Fragment, useState, useRef} from "react";
 import styled from "styled-components";
-import {Link} from "react-router-dom";
+import FileBase64 from 'react-file-base64';
 import {useParams} from "react-router-dom";
 import {
     Add,
@@ -11,7 +11,7 @@ import {
     Delete,
     DonutLarge,
     Edit, FileCopy,
-    PersonAdd,
+    PersonAdd, Upload,
 } from "@mui/icons-material";
 import {data, tools, members, ideas, tagColors} from "../data/data";
 import WorkCards from "../components/WorkCards";
@@ -23,7 +23,7 @@ import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import {openSnackbar} from "../redux/snackbarSlice";
 import {useDispatch} from "react-redux";
-import {getProjectDetails, getWorks} from "../api/index";
+import {getProjectDetails, getWorks, updateProjectFile} from "../api/index";
 import InviteMembers from "../components/InviteMembers";
 import AddWork from "../components/AddWork";
 import WorkDetails from "../components/WorkDetails";
@@ -31,6 +31,9 @@ import UpdateProject from "../components/UpdateProject";
 import DeletePopup from "../components/DeletePopup";
 import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
 import {useNavigate} from 'react-router-dom'
+import {render} from "react-dom";
+import FileSelector from "../components/FileSelector";
+
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -330,6 +333,22 @@ const ProjectDetails = () => {
             });
     };
 
+    const uploadProjectFile = async (file) => {
+         await updateProjectFile(id, {file : file}, token)
+            .then((res) => {
+                getproject()
+            })
+            .catch((err) => {
+                dispatch(
+                    openSnackbar({
+                        message: err.response.data.message,
+                        severity: "error",
+                    })
+                );
+            });
+    };
+
+
     const getProjectWorks = async (id) => {
         await getWorks(id, token)
             .then((res) => {
@@ -360,6 +379,8 @@ const ProjectDetails = () => {
         getProjectWorks(id);
     }, [created]);
 
+
+
     function downloadPDF(pdf) {
         const linkSource = pdf;
         const downloadLink = document.createElement("a");
@@ -370,7 +391,9 @@ const ProjectDetails = () => {
         downloadLink.click();
     }
 
+
     const [alignment, setAlignment] = React.useState(true);
+
 
 
     return (
@@ -423,6 +446,14 @@ const ProjectDetails = () => {
                             </InviteButton>
                         </Members>
                         <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
+                            <IcoBtn>
+                                <FileBase64 multiple={false}    onDone={async ({base64}) => {
+                                    console.log(base64);
+                                    uploadProjectFile(base64);
+
+                                } }
+                                />
+                            </IcoBtn>
                             <IcoBtn onClick={() => setOpenUpdate({state: true, type: 'all', data: item})}>
                                 <Edit sx={{fontSize: "20px"}}/>
                             </IcoBtn>
@@ -438,13 +469,13 @@ const ProjectDetails = () => {
                             <IcoBtn onClick={() => navigate(`/projects/${id}/chats`)}>
                                 <Chat sx={{fontSize: "20px"}}/>
                             </IcoBtn>
-                            <IcoBtn onClick={() => {
-                               downloadPDF(item.file)
+                            {item.file !== "" &&
+                                <IcoBtn onClick={() => {
+                                    downloadPDF(item.file)
+                                }}>
+                                    <FileCopy sx={{fontSize: "20px"}}/>
+                                </IcoBtn>
                             }
-                            }
-                            >
-                                <FileCopy sx={{fontSize: "20px"}}/>
-                            </IcoBtn>
                         </div>
 
                         <Hr/>

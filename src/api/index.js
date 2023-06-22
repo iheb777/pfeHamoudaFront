@@ -64,6 +64,8 @@ export const addWorks = async (id, works, token) => await API.post(`/project/wor
 export const getWorks = async (id, token) => await API.get(`/project/works/${id}`, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
 export const verifyProjectInvite = async (code, projectid, userid, access, role) => await API.get(`/project/invite/${code}?projectid=${projectid}&userid=${userid}&access=${access}&role=${role}`, {withCredentials: true});
 export const updateProject = async (id, project, token) => await API.patch(`/project/${id}`, project, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
+export const updateProjectFile = async (id, project, token) => await API.patch(`/project/updateFile/${id}`, project, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
+
 export const deleteProject = async (id, token) => await API.delete(`/project/${id}`, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
 export const updateMembers = async (id, members, token) => await API.patch(`/project/member/${id}`, members, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
 export const removeMembers = async (id, members, token) => await API.patch(`/project/member/remove/${id}`, members, {headers: {"Authorization": `Bearer ${token}`}}, {withCredentials: true});
